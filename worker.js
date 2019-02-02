@@ -4,6 +4,7 @@
  */
 
 // Initial state of the worker
+// (Default values)
 let state = {
   servers: [],
   loadAlgo: '',
@@ -43,20 +44,27 @@ const actions = {
   },
   getServer() {
     return state.servers[0];
+  },
+  isActive() {
+    return state.isActive;
   }
 };
 
 self.onmessage = (e) => {
+  let response = null;
   switch (e.data.msg) {
     case 'start':
-      actions.startLoadBalancingLoop(e.data.config); break;
+      response = actions.startLoadBalancingLoop(e.data.config); break;
     case 'stop':
-      actions.stopLoadBalancingLoop(); break;
+      response = actions.stopLoadBalancingLoop(); break;
     case 'destroy':
-      actions.destroyWorker(); break;
+      response = actions.destroyWorker(); break;
     case 'get-server':
-      actions.getServer(); break;
+      response = actions.getServer(); break;
+    case 'is-active?':
+      response = actions.isActive(); break;
   }
+  self.postMessage( response );
 };
 
 
