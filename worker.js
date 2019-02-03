@@ -7,30 +7,35 @@
 // (Default values)
 let state = {
   servers: [],
-  loadAlgo: '',
-  balancingAlgo: '',
+  mostAvailableServer: '',
+  loadBalancingFunction: '',
   loadBalancingLoopID: null,
   interval: 5000,
-  timeout: 2000,
   isActive: false
 };
 
 // Actions the worker is able to perform
 const actions = {
-  startLoadBalancingLoop(config) {
-    Object.assign(state, config);
-    state.loadBalancingLoopID = setInterval(
-      () => {
-        state.servers = loadBalancing(
-          state.servers,
-          state.loadAlgo,
-          state.balancingAlgo,
-          state.timeout
-        );
-      }
-    , state.interval);
-    state.isActive = true;
-    return true;
+  initializeWorker(config) {
+    try {
+      actions.stopLoadBalancingLoop();
+      Object.assign(state, config);
+      self.importScript( state.loadBalancingFunction );
+      return true;
+    } catch (err) {
+      return false;
+    }
+  },
+  startLoadBalancingLoop() {
+    if (!state.isActive) {
+      state.loadBalancingLoopID = setInterval(
+        () => loadBalancing( state.servers ).then(server => state.mostAvailableServer = server),
+        state.interval
+      );
+      state.isActive = true;
+      return true;
+    }
+    return false;
   },
   stopLoadBalancingLoop() {
     clearInterval( state.loadBalancingLoopID );
@@ -38,12 +43,12 @@ const actions = {
     return true;
   },
   destroyWorker() {
-    state.isActive && actions.stopLoadBalancingLoop();
+    actions.stopLoadBalancingLoop();
     self.close();
-    return;
   },
   getServer() {
-    return state.servers[0];
+    if (state.isActive) return state.mostAvailableServer;
+    return null;
   },
   isActive() {
     return state.isActive;
@@ -53,12 +58,14 @@ const actions = {
 self.onmessage = (e) => {
   let response = null;
   switch (e.data.msg) {
+    case 'init':
+      response = actions.initializeWorker(e.data.config); break;
     case 'start':
-      response = actions.startLoadBalancingLoop(e.data.config); break;
+      response = actions.startLoadBalancingLoop(); break;
     case 'stop':
       response = actions.stopLoadBalancingLoop(); break;
     case 'destroy':
-      response = actions.destroyWorker(); break;
+      actions.destroyWorker(); break;
     case 'get-server':
       response = actions.getServer(); break;
     case 'is-active?':
@@ -66,46 +73,3 @@ self.onmessage = (e) => {
   }
   self.postMessage( response );
 };
-
-
-function loadBalancing(servers, loadAlgo, balancingAlgo, timeout) {
-  Promise.all(
-    servers.map( server => getLoad(server, loadAlgo, timeout) )
-  )
-  .then(loads => {
-    return balance(loads, balancingAlgo);
-  })
-  .catch(err => {
-    return servers;
-  });
-}
-
-function getLoad(server, loadAlgo, timeout) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => reject('timeout'), timeout);
-    fetch(`${server}/load-ping?algorithm=${loadAlgo}`)
-      .then(res => {
-        return res.json();
-      })
-      .then(load => {
-        resolve({
-          server: server,
-          load: load.value,
-          error: null
-        });
-      });
-  })
-  .catch(err => {
-    return {
-      server: server,
-      load: +Infinity,
-      error: err
-    };
-  });
-}
-
-function balance(loads, balancingAlgo) {
-  return loads
-    .sort( (x, y) => x.load-y.load )
-    .map( x => x.server );
-}
