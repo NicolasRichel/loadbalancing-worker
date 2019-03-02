@@ -7,14 +7,14 @@
 // (Default values)
 let state = {
   servers: [],
-  mostAvailableServer: '',
+  targetServer: '',
   loadBalancingFunction: '',
   loadBalancingLoopID: null,
   interval: 5000,
   isActive: false
 };
 
-// Actions the worker is able to perform
+// Worker Actions
 const actions = {
   initializeWorker(config) {
     try {
@@ -29,7 +29,7 @@ const actions = {
   startLoadBalancingLoop() {
     if (!state.isActive) {
       state.loadBalancingLoopID = setInterval(
-        () => loadBalancing( state.servers ).then(server => state.mostAvailableServer = server),
+        () => loadBalancing( state.servers ).then(server => state.targetServer = server),
         state.interval
       );
       state.isActive = true;
@@ -47,7 +47,7 @@ const actions = {
     self.close();
   },
   getServer() {
-    if (state.isActive) return state.mostAvailableServer;
+    if (state.isActive) return state.targetServer;
     return null;
   },
   isActive() {
