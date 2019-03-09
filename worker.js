@@ -3,8 +3,7 @@
  * =====================
  */
 
-// Initial state of the worker
-// (Default values)
+// Initial state of the worker (Default values)
 let state = {
   servers: [],
   targetServer: '',
@@ -37,6 +36,13 @@ const actions = {
     }
     return false;
   },
+  getServer() {
+    if (state.isActive) return state.targetServer;
+    return null;
+  },
+  isActive() {
+    return state.isActive;
+  },
   stopLoadBalancingLoop() {
     clearInterval( state.loadBalancingLoopID );
     state.isActive = false;
@@ -45,15 +51,9 @@ const actions = {
   destroyWorker() {
     actions.stopLoadBalancingLoop();
     self.close();
-  },
-  getServer() {
-    if (state.isActive) return state.targetServer;
-    return null;
-  },
-  isActive() {
-    return state.isActive;
   }
 };
+
 
 self.onmessage = (e) => {
   let response = null;
@@ -62,14 +62,14 @@ self.onmessage = (e) => {
       response = actions.initializeWorker(e.data.config); break;
     case 'start':
       response = actions.startLoadBalancingLoop(); break;
-    case 'stop':
-      response = actions.stopLoadBalancingLoop(); break;
-    case 'destroy':
-      actions.destroyWorker(); break;
     case 'get-server':
       response = actions.getServer(); break;
     case 'is-active?':
       response = actions.isActive(); break;
+    case 'stop':
+      response = actions.stopLoadBalancingLoop(); break;
+    case 'destroy':
+      actions.destroyWorker();
   }
   self.postMessage( response );
 };

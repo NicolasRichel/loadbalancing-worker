@@ -15,7 +15,7 @@ worker to which server the request should be sent.
 
 The image below illustrate this architecture.
 
-![schema-1](./schema-1.png)
+![schema](./schema.png)
 
 ## Documentation
 
