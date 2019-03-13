@@ -7,7 +7,7 @@
 let state = {
   servers: [],
   targetServer: '',
-  loadBalancingFunction: '',
+  loadBalancingScript: '',
   loadBalancingLoopID: null,
   interval: 5000,
   isActive: false
@@ -19,7 +19,7 @@ const actions = {
     try {
       actions.stopLoadBalancingLoop();
       Object.assign(state, config);
-      self.importScript( state.loadBalancingFunction );
+      self.importScript( state.loadBalancingScript );
       return true;
     } catch (err) {
       return false;
