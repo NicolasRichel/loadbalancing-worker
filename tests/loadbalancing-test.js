@@ -8,5 +8,5 @@
  */
 
 function loadBalancing(servers) {
-  return servers[0];
+  return Promise.resolve( servers[0] );
 }

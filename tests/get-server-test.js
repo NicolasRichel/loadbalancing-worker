@@ -1,7 +1,11 @@
+const NAME = 'Get Server';
+const DESCRIPTION = 'should get the address of the most available server';
+
 export function test() {
   return {
-    testName: 'Get Server',
-    message: 'should get the address of the most available server',
+    testName: NAME,
+    description: DESCRIPTION,
+    message: '',
     success: false
   };
 };

@@ -5,40 +5,42 @@
 const TIMEOUT = 2000;
 const LOAD_ALGORITHM = ''
 
-function loadBalancing(servers) {
-  return Promise.all(
-    servers.map( server => getLoad( server ) )
-  )
-  .then(loads => {
+async function loadBalancing(servers) {
+  try {
+    const loads = await Promise.all(
+      servers.map( server => getLoad(server) )
+    );
     return balance(loads);
-  })
-  .catch(err => {
+  }
+  catch (err) {
     return servers[0];
-  });
+  }
 }
 
-function getLoad(server) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => reject('timeout'), TIMEOUT);
-    fetch(`${server}/load-ping?algorithm=${LOAD_ALGORITHM}`)
-      .then(res => {
-        return res.json();
-      })
-      .then(load => {
-        resolve({
-          server: server,
-          load: load.value,
-          error: null
+async function getLoad(server) {
+  try {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => reject('timeout'), TIMEOUT);
+      fetch(`${server}/load-ping?algorithm=${LOAD_ALGORITHM}`)
+        .then(res => {
+          return res.json();
+        })
+        .then(load => {
+          resolve({
+            server: server,
+            load: load.value,
+            error: null
+          });
         });
-      });
-  })
-  .catch(err => {
-    return {
+    });
+  }
+  catch (err) {
+    return Promise.resolve({
       server: server,
       load: +Infinity,
       error: err
-    };
-  });
+    });
+  }
 }
 
 function balance(loads) {

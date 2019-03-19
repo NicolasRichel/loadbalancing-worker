@@ -1,10 +1,10 @@
 const testList = [
   './init-test.js',
   './start-test.js',
-  './stop-test.js',
-  './destroy-test.js',
   './get-server-test.js',
-  './is-active-test.js'
+  './is-active-test.js',
+  './stop-test.js',
+  './destroy-test.js'
 ];
 
 function runAllTests() {
@@ -26,7 +26,7 @@ function displayTestResults(results) {
       .insertAdjacentHTML('beforeend', `
         <div class="test">
           <div class="circle ${result.success ? 'success' : 'failure'}"></div>
-          <span class="test-msg"><b>${result.testName}</b> : ${result.message}</span>
+          <span class="test-msg"><b>${result.testName}</b> : ${result.description}</span>
         </div>
       `);
   });

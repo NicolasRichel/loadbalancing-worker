@@ -1,7 +1,11 @@
+const NAME = 'Start';
+const DESCRIPTION = 'should start load balancing loop';
+
 export function test() {
   return {
-    testName: 'Start',
-    message: 'should start load balancing loop',
+    testName: NAME,
+    description: DESCRIPTION,
+    message: '',
     success: false
   };
 };
