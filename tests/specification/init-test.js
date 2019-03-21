@@ -2,9 +2,9 @@ const NAME = 'Initialize';
 const DESCRIPTION = 'should initialize worker state via configuration';
 
 export function test() {
-
-  const worker = new Worker('/worker.js');
+  
   let result = false;
+  const worker = new Worker('/worker.js');
 
   worker.onmessage = (e) => result = e.data;
   worker.onerror = () => result = false;
@@ -16,6 +16,8 @@ export function test() {
       loadBalancingScript: '/tests/loadbalancing-test.js'
     }
   });
+
+  // TODO assert that worker state has been properly initialized
 
   return {
     testName: NAME,
