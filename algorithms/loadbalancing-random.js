@@ -3,7 +3,7 @@
  * =====================
  */
 
-function loadBalancing(servers) {
-  const n = Math.floor( Math.random() * (servers.length + 1) );
-  return Promise.resolve( servers[n] );
+function loadBalancing(endpoints) {
+  const n = Math.floor( Math.random() * (endpoints.length + 1) );
+  return Promise.resolve( endpoints[n] );
 }

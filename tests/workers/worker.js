@@ -3,14 +3,18 @@
  * =====================
  */
 
-// Initial state of the worker (Default values)
-let state = {
-  servers: [],
-  targetServer: '',
+// Initial configuration of the worker
+let wConfig = {
+  endpoints: [],
   loadBalancingScript: '',
-  loadBalancingLoopID: null,
-  interval: 5000,
-  isActive: false
+  interval: 5000
+};
+
+// Initial state of the worker
+let wState = {
+  isActive: false,
+  targetEndpoint: '',
+  loadBalancingLoopID: -1,
 };
 
 // Worker Actions
@@ -18,8 +22,8 @@ const actions = {
   initializeWorker(config) {
     try {
       actions.stopLoadBalancingLoop();
-      Object.assign(state, config);
-      self.importScript( state.loadBalancingScript );
+      Object.assign(wConfig, config);
+      self.importScripts( wConfig.loadBalancingScript );
       return true;
     } catch (err) {
       return false;
@@ -27,25 +31,26 @@ const actions = {
   },
   startLoadBalancingLoop() {
     if (!state.isActive) {
-      state.loadBalancingLoopID = setInterval(
-        () => loadBalancing( state.servers ).then(server => state.targetServer = server),
-        state.interval
+      wState.loadBalancingLoopID = setInterval(
+        () => loadBalancing( wConfig.endpoints ).then(endpoint => wState.targetEndpoint = endpoint),
+        wConfig.interval
       );
-      state.isActive = true;
+      wState.isActive = true;
       return true;
     }
     return false;
   },
-  getServer() {
-    if (state.isActive) return state.targetServer;
+  getEndpoint() {
+    if (wState.isActive) return wState.targetEndpoint;
     return null;
   },
   isActive() {
     return state.isActive;
   },
   stopLoadBalancingLoop() {
-    clearInterval( state.loadBalancingLoopID );
-    state.isActive = false;
+    clearInterval( wState.loadBalancingLoopID );
+    wState.loadBalancingLoopID = -1;
+    wState.isActive = false;
     return true;
   },
   destroyWorker() {
@@ -57,19 +62,19 @@ const actions = {
 
 self.onmessage = (e) => {
   let response = null;
-  switch (e.data.msg) {
+  switch (e.data.action) {
     case 'init':
       response = actions.initializeWorker(e.data.config); break;
     case 'start':
       response = actions.startLoadBalancingLoop(); break;
-    case 'get-server':
-      response = actions.getServer(); break;
+    case 'get-endpoint':
+      response = actions.getEndpoint(); break;
     case 'is-active?':
       response = actions.isActive(); break;
     case 'stop':
       response = actions.stopLoadBalancingLoop(); break;
     case 'destroy':
-      actions.destroyWorker();
+      actions.destroyWorker(); break;
   }
   self.postMessage( response );
 };

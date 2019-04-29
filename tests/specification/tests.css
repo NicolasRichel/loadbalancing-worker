@@ -1,36 +1,131 @@
+/* General */
+/* ''''''' */
+
+:root {
+  /* Colors */
+  --chateau-green: #34A853;
+  --cinnabar: #EA4335;
+  --concrete: #F2F2F2;
+  --cornflower-blue: #4583EC;
+  --dusty-gray: #999;
+  --gallery: #EEE;
+  --jewel: #128631;
+  --mariner: #2361CA;
+  --mine-shaft: #2A2A2A;
+  --thunderbird: #C82113;
+  --white: #FFF;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  color: var(--mine-shaft);
+}
+
 h1 {
+  margin: 0;
+  padding: 20px;
   text-align: center;
   text-decoration: underline;
+  background-color: var(--concrete);
 }
 
-#test-results {
-  margin-left: 10%;
+button {
+  width: var(--width);
+  height: var(--height);
+  margin: 0 10px;
+  border: none;
+  border-radius: calc( var(--width) - var(--height)/2 );
+  font-size: 1.1rem;
+  font-weight: bold;
+  outline: none;
+  background-color: var(--cornflower-blue);
+  color: var(--white);
 }
 
-#test-results > .test {
+button:hover {
+  background-color: var(--mariner);
+}
+
+#run-all-btn {
+  --width: 150px;
+  --height: 40px;
+  margin: 15px 10px;
+  margin-left: 5%;
+}
+
+
+
+/* Test Report */
+/* ''''''''''' */
+
+#test-report {}
+
+
+
+/* Test Suites Results */
+/* ''''''''''''''''''' */
+
+#test-suites-results {
+  width: 90%;
+  margin: auto;
+}
+
+#test-suites-results
+> .test-suite {
+  margin: 16px 0;
   padding: 8px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px var(--dusty-gray);
 }
 
-#test-results > .test > .test-msg {}
+#test-suites-results
+> .test-suite
+> .test-suite-name {
+  display: inline-block;
+  margin: 0;
+}
+
+#test-suites-results
+> .test-suite
+> .run-btn {
+  float: right;
+  --width: 112px;
+  --height: 26px;
+}
+
+#test-suites-results
+> .test-suite
+> .tests-results {
+  margin: 12px;
+}
+
+
+
+/* Test Results */
+/* '''''''''''' */
+
+.tests-results
+> .result {
+  margin-top: 10px;
+}
 
 .circle {
   display: inline-block;
-  width: 10px;
-  height: 10px;
+  vertical-align: top;
+  width: 14px;
+  height: 14px;
   margin: 0 4px;
-  border: 1px solid black;
+  border: 1px solid;
   border-radius: 50%;
 }
 
 .circle.success {
-  background-color: green;
+  background-color: var(--chateau-green);
+  border-color: var(--jewel);
 }
 
 .circle.failure {
-  background-color: red;
-}
-
-#test-report {
-  margin: 32px;
-  text-align: center;
+  background-color: var(--cinnabar);
+  border-color: var(--thunderbird);
 }
