@@ -9,6 +9,7 @@ export class TestRenderer {
 
 
   initializeView() {
+    this._container.innerHTML = '';
     this._testSuites.forEach(
       testSuite => this._container.insertAdjacentHTML(
         'beforeend', `

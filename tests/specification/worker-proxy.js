@@ -2,9 +2,7 @@
 
 self.onmessage = (e) => {
   if (e.data.action === 'proxy-init') {
-    let workerName = e.data.workerName;
-    workerName = workerName.endsWith('.js') ? workerName : workerName+'.js';
-    self.importScripts(`/workers/${workerName}`);
+    self.importScripts(`/workers/${e.data.workerName}`);
 
     let actionCalls = [];
     Object.keys(actions).forEach(

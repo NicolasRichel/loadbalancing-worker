@@ -32,6 +32,7 @@ h1 {
 }
 
 div {
+  position: relative;
   margin: 10px 0;
 }
 
@@ -48,18 +49,41 @@ button {
   color: var(--white);
 }
 
-button:hover {
-  background-color: var(--mariner);
-}
-
 button:disabled {
   opacity: 0.5;
 }
 
+button:hover:not(:disabled) {
+  background-color: var(--mariner);
+}
+
+
+
+/* Worker Name */
+/* ''''''''''' */
+
+label[for=worker-name] {
+  margin-left: 5%;
+  font-weight: bold;
+}
+
 #worker-name {
   height: 22px;
-  margin-left: 5%;
   padding-left: 5px;
+}
+
+#worker-name.error {
+  height: 24px;
+  margin: 0 2px;
+  border: none;
+  box-shadow: 0 0 8px var(--cinnabar);
+}
+
+#worker-name-message {
+  position: absolute;
+  top: 30px;
+  left: 168px;
+  color: var(--thunderbird);
 }
 
 #init-btn {
@@ -75,7 +99,7 @@ button:disabled {
 #run-all-btn {
   --width: 150px;
   --height: 40px;
-  margin: 15px 10px;
+  margin: 30px 10px;
   margin-left: 5%;
 }
 
