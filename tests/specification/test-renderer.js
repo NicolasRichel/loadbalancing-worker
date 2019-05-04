@@ -14,7 +14,7 @@ export class TestRenderer {
         'beforeend', `
         <div id="${testSuite.name}" class="test-suite">
           <h2 class="test-suite-name">${testSuite.name}</h2>
-          <button class="run-btn">Run Tests</button>
+          <button class="run-btn" name="${testSuite.name}">Run Tests</button>
           <div class="tests-results"></div>
         <div>
       `)

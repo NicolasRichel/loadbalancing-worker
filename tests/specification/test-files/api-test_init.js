@@ -12,11 +12,9 @@ export const run = {
 };
 
 
-function shouldInitializeConfig() {
+function shouldInitializeConfig( worker ) {
 
   // --{ ARRANGE }--
-  const worker = new Worker('/specification/worker-proxy.js');
-
   const resultPromise = prepareAssertion(
     worker,
     (response, data) => {
@@ -61,7 +59,6 @@ function shouldInitializeConfig() {
 
   return resultPromise.then(
     value => {
-      worker.terminate();
       return {
         message: '',
         success: value
@@ -71,11 +68,9 @@ function shouldInitializeConfig() {
 }
 
 
-function shouldStopLoadBalancingLoop() {
+function shouldStopLoadBalancingLoop( worker ) {
   
   // --{ ARRANGE }--
-  const worker = new Worker('/specification/worker-proxy.js');
-
   worker.postMessage({
     action: 'init',
     config: {
@@ -119,7 +114,6 @@ function shouldStopLoadBalancingLoop() {
 
   return resultPromise.then(
     value => {
-      worker.terminate();
       return {
         message: '',
         success: value
