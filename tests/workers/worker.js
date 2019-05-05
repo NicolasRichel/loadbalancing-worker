@@ -1,7 +1,7 @@
-/**
- * Load Balancing Worker
- * =====================
- */
+// =====================
+// Load Balancing Worker
+// =====================
+
 
 // Initial configuration of the worker
 let wConfig = {
@@ -30,7 +30,7 @@ const actions = {
     }
   },
   startLoadBalancingLoop() {
-    if (!state.isActive) {
+    if (!wState.isActive) {
       wState.loadBalancingLoopID = setInterval(
         () => loadBalancing( wConfig.endpoints ).then(endpoint => wState.targetEndpoint = endpoint),
         wConfig.interval
@@ -41,11 +41,10 @@ const actions = {
     return false;
   },
   getEndpoint() {
-    if (wState.isActive) return wState.targetEndpoint;
-    return null;
+    return wState.isActive ? wState.targetEndpoint : null;
   },
   isActive() {
-    return state.isActive;
+    return wState.isActive;
   },
   stopLoadBalancingLoop() {
     clearInterval( wState.loadBalancingLoopID );

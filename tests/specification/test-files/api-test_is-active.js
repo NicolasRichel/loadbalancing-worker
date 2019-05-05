@@ -1,21 +1,84 @@
-const NAME = 'Is Active';
-const TEST_1 = 'should return false if worker is idle';
-const TEST_2 = 'should return true if worker is active';
+import { prepareAssertion } from '../test-utils.js';
 
 
-export function test() {
-  return Promise.resolve([
-    {
-      testName: NAME,
-      description: TEST_1,
-      message: '',
-      success: false
-    },
-    {
-      testName: NAME,
-      description: TEST_2,
-      message: '',
-      success: false
-    }
-  ]);
+export const run = {
+  shouldBeFalseWhenIdle: shouldBeFalseWhenIdle,
+  shouldBeTrueWhenActive: shouldBeTrueWhenActive
 };
+
+
+function shouldBeFalseWhenIdle( worker ) {
+  // --{ ARRANGE }--
+  worker.postMessage({
+    action: 'init',
+    config: {
+      endpoints: ['A', 'B', 'C'],
+      loadBalancingScript: 'hello-world.js'
+    }
+  });
+
+  const resultPromise = prepareAssertion(
+    worker,
+    (response, data) => {
+      // --{ ASSERT }--
+      let result = true;
+      result = result && !response;
+      result = result && !data.wState.isActive;
+      return result;
+    }
+  );
+
+  // --{ ACT }--
+  worker.postMessage({
+    action: 'is-active?'
+  });
+
+  return resultPromise.then(
+    value => {
+      return {
+        message: '',
+        success: value
+      };
+    }
+  );
+}
+
+
+function shouldBeTrueWhenActive( worker ) {
+  // --{ ARRANGE }--
+  worker.postMessage({
+    action: 'init',
+    config: {
+      endpoints: ['A', 'B', 'C'],
+      loadBalancingScript: '/specification/loadbalancing-test.js'
+    }
+  });
+  worker.postMessage({
+    action: 'start'
+  });
+
+  const resultPromise = prepareAssertion(
+    worker,
+    (response, data) => {
+      // --{ ASSERT }--
+      let result = true;
+      result = result && response;
+      result = result && data.wState.isActive;
+      return result;
+    }
+  );
+
+  // --{ ACT }--
+  worker.postMessage({
+    action: 'is-active?'
+  });
+
+  return resultPromise.then(
+    value => {
+      return {
+        message: '',
+        success: value
+      };
+    }
+  );
+}
