@@ -17,8 +17,8 @@ fi
 if ! type "http-server" > /dev/null 2>&1; then
   echo "This run script use the 'http-server' npm package."
   echo "The package 'http-server' is not installed yet."
-  read -p "Would you like to install it globally ( npm install -g http-server ) ? (y/N) " ans
-  if [ "$ans" = "y" ] || [ "$ans" = "Y" ]; then
+  read -p "Would you like to install it globally ( npm install -g http-server ) ? (y/N) " INPUT
+  if [ "$INPUT" = "y" ] || [ "$INPUT" = "Y" ]; then
     npm install -g http-server
   else
     exit 0
@@ -31,8 +31,22 @@ if [ -z "$PORT" ]; then
   PORT=9000
 fi
 
-# Serve test directory statically
+# Serve test directory locally
+echo "Starting HTTP server..."
 http-server -p $PORT . > /dev/null &
+PID=$!
+echo "Server started (PID: $PID) and listening on port $PORT."
 
 # Open spec tests page in Chromium
-chromium-browser http://localhost:$PORT/specification/tests.html
+echo -n "Launching Chromium web browser... "
+chromium-browser http://localhost:$PORT/specification/tests.html > /dev/null &
+echo "Browser launched."
+
+echo "Type 'q' to stop HTTP server."
+INPUT=""
+while [ ! "$INPUT" = "q" ]; do
+  read INPUT
+done
+kill $PID
+
+exit 0
