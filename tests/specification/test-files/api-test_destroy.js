@@ -1,14 +1,9 @@
-const NAME = 'Destroy';
-const TEST_1 = 'should terminate worker execution';
+export const run = {};
 
 
-export function test() {
-  return Promise.resolve([
-    {
-      testName: NAME,
-      description: TEST_1,
-      message: '',
-      success: false
-    }
-  ]);
+export function test( worker ) {
+  return Promise.resolve({
+    message: '',
+    success: false
+  });
 };

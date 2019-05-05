@@ -1,14 +1,14 @@
-const NAME = 'Start';
-const TEST_1 = 'should start load balancing loop';
+import { prepareAssertion } from '../test-utils.js';
 
 
-export function test() {
-  return Promise.resolve([
-    {
-      testName: NAME,
-      description: TEST_1,
-      message: '',
-      success: false
-    }
-  ]);
+export const run = {
+  shouldActivate: shouldActivate
+};
+
+
+function shouldActivate( worker ) {
+  return Promise.resolve({
+    message: '',
+    success: false
+  });
 };

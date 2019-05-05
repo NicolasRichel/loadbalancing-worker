@@ -1,14 +1,11 @@
-const NAME = 'Stop';
-const TEST_1 = 'should stop load balancing loop';
+export const run = {
+  shouldDeactivate: shouldDeactivate
+};
 
 
-export function test() {
-  return Promise.resolve([
-    {
-      testName: NAME,
-      description: TEST_1,
-      message: '',
-      success: false
-    }
-  ]);
+export function shouldDeactivate( worker ) {
+  return Promise.resolve({
+    message: '',
+    success: false
+  });
 };

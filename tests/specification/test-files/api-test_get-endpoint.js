@@ -1,14 +1,9 @@
-const NAME = 'Get Endpoint';
-const TEST_1 = 'should return an endpoint';
+export const run = {};
 
 
-export function test() {
-  return Promise.resolve([
-    {
-      testName: NAME,
-      description: TEST_1,
-      message: '',
-      success: false
-    }
-  ]);
+export function test( worker ) {
+  return Promise.resolve({
+    message: '',
+    success: false
+  });
 };
