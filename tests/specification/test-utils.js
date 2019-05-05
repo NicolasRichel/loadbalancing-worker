@@ -38,10 +38,10 @@ export function prepareAssertion(worker, assertFunction) {
     (resolve, reject) => {
       let response;
       worker.onmessage = (e) => {
-        if (e.data.type==='proxy-data') {
+        if (e.data.type === 'proxy-data') {
           resolve( assertFunction(response, e.data) );
         } else {
-          response = e.data
+          response = e.data;
         }
       };
       worker.onerror = () => {
