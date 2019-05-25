@@ -1,9 +1,10 @@
-export const run = {};
+
+export const tests = [];
 
 
 export function test( worker ) {
   return Promise.resolve({
-    message: '',
-    success: false
+    success: false,
+    message: ''
   });
 };

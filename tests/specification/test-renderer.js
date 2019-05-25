@@ -43,6 +43,7 @@ export class TestRenderer {
           <div class="result">
             <div class="circle ${result.success ? 'success' : 'failure'}"></div>
             <span class="test-description">${result.description}</span>
+            ${result.success ? '' : `<div class="test-message">${result.message}</div>`}
           </div>
         `),
         100*(i+1)

@@ -52,11 +52,11 @@ export class TestRunner {
     return import( `./test-files/${testSuite.file}` )
       .then(
         testModule => Promise.all(
-          testSuite.tests.map(
+          testModule.tests.map(
             test => {
               const worker = new Worker('/specification/worker-proxy.js');
               this._beforeEach( worker );
-              return testModule.run[test.testFunction]( worker ).then(
+              return test.testFunction( worker ).then(
                 result => {
                   this._afterEach( worker );
                   return Object.assign( result, { description: test.description } );
@@ -67,10 +67,10 @@ export class TestRunner {
         )
       )
       .then(
-        testsResults => Object.assign(
-          { name: testSuite.name },
-          { results: testsResults }
-        )
+        testsResults => ({
+          name: testSuite.name,
+          results: testsResults
+        })
       );
   }
 

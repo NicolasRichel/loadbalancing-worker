@@ -1,11 +1,15 @@
-export const run = {
-  shouldDeactivate: shouldDeactivate
-};
+
+export const tests = [
+  {
+    description: 'should deactivate if worker is active',
+    testFunction: shouldDeactivate
+  }
+];
 
 
 export function shouldDeactivate( worker ) {
   return Promise.resolve({
-    message: '',
-    success: false
+    success: false,
+    message: ''
   });
 };

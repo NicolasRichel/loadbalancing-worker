@@ -23,7 +23,7 @@ const actions = {
     try {
       actions.stopLoadBalancingLoop();
       Object.assign(wConfig, config);
-      self.importScripts( wConfig.loadBalancingScript );
+      // self.importScripts( wConfig.loadBalancingScript );
       return true;
     } catch (err) {
       return false;

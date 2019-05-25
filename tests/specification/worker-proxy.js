@@ -5,13 +5,13 @@ let actionCalls;
 self.onmessage = (e) => {
   if (e.data.action === 'proxy-init') {
     self.importScripts(`/workers/${e.data.workerName}`);
-    setUpActionWrapper();
-    setUpMessageHandler();
+    setupActionWrapper();
+    setupMessageHandler();
   }
 };
 
 
-function setUpActionWrapper() {
+function setupActionWrapper() {
   actionCalls = [];
   Object.keys(actions).forEach(
     action => {
@@ -28,7 +28,7 @@ function setUpActionWrapper() {
   );
 }
 
-function setUpMessageHandler() {
+function setupMessageHandler() {
   const handleMessage = self.onmessage;
   self.onmessage = (e) => {
     actionCalls = [];
@@ -44,7 +44,8 @@ function setUpMessageHandler() {
       type: 'proxy-data',
       wConfig: wConfig,
       wState: wState,
-      actionCalls: actionCalls
+      actionCalls: actionCalls,
+      assert: !!e.data.assert
     });
   }
 }

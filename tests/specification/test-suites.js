@@ -3,64 +3,26 @@
 export const testSuites = [
   {
     name: 'Initialize',
-    file: 'api-test_init.js',
-    tests: [
-      {
-        description: 'should initialize worker configuration',
-        testFunction: 'shouldInitializeConfig'
-      },
-      {
-        description: 'should update worker configuration',
-        testFunction: 'shouldUpdateConfig'
-      },
-      {
-        description: 'should stop load balancing loop (if running)',
-        testFunction: 'shouldStopLoadBalancingLoop'
-      }
-    ]
+    file: 'api-test_init.js'
   },
   {
     name: 'Start',
-    file: 'api-test_start.js',
-    tests: [
-      {
-        description: 'should activate worker',
-        testFunction: 'shouldActivate'
-      }
-    ]
+    file: 'api-test_start.js'
   },
   {
     name: 'Stop',
-    file: 'api-test_stop.js',
-    tests: [
-      {
-        description: 'should deactivate worker',
-        testFunction: 'shouldDeactivate'
-      }
-    ]
+    file: 'api-test_stop.js'
   },
   {
     name: 'Is-Active',
-    file: 'api-test_is-active.js',
-    tests: [
-      {
-        description: 'should return false if worker is idle',
-        testFunction: 'shouldBeFalseWhenIdle'
-      },
-      {
-        description: 'should return true if worker is active',
-        testFunction: 'shouldBeTrueWhenActive'
-      }
-    ]
+    file: 'api-test_is-active.js'
   },
   {
     name: 'Get-Endpoint',
-    file: 'api-test_get-endpoint.js',
-    tests: []
+    file: 'api-test_get-endpoint.js'
   },
   {
     name: 'Destroy',
-    file: 'api-test_destroy.js',
-    tests: []
+    file: 'api-test_destroy.js'
   }
 ];

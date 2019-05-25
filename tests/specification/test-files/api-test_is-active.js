@@ -1,10 +1,20 @@
-import { prepareAssertion } from '../test-utils.js';
+import {
+  assert,
+  prepareAssertion,
+  executeAssertionBlock
+} from '../test-utils.js';
 
 
-export const run = {
-  shouldBeFalseWhenIdle: shouldBeFalseWhenIdle,
-  shouldBeTrueWhenActive: shouldBeTrueWhenActive
-};
+export const tests = [
+  {
+    description: 'should return false if worker is idle',
+    testFunction: shouldBeFalseWhenIdle
+  },
+  {
+    description: 'should return true if worker is active',
+    testFunction: shouldBeTrueWhenActive
+  }
+];
 
 
 function shouldBeFalseWhenIdle( worker ) {
@@ -17,29 +27,23 @@ function shouldBeFalseWhenIdle( worker ) {
     }
   });
 
-  const resultPromise = prepareAssertion(
-    worker,
-    (response, data) => {
-      // --{ ASSERT }--
-      let result = true;
-      result = result && !response;
-      result = result && !data.wState.isActive;
-      return result;
-    }
-  );
-
   // --{ ACT }--
   worker.postMessage({
-    action: 'is-active?'
+    action: 'is-active?',
+    assert: true
   });
 
-  return resultPromise.then(
-    value => {
-      return {
-        message: '',
-        success: value
-      };
-    }
+  return prepareAssertion( worker ).then(
+    ({response, data }) => executeAssertionBlock(() => {
+      // --{ ASSERT }--
+      let result = assert(
+        !response, 'expect "response" to be false'
+      );
+      result = result && assert(
+        !data.wState.isActive, 'expect "state.isActive" to be false'
+      );
+      return result;
+    })
   );
 }
 
@@ -50,35 +54,29 @@ function shouldBeTrueWhenActive( worker ) {
     action: 'init',
     config: {
       endpoints: ['A', 'B', 'C'],
-      loadBalancingScript: '/specification/loadbalancing-test.js'
+      loadBalancingScript: '/abcd.js'
     }
   });
   worker.postMessage({
     action: 'start'
   });
 
-  const resultPromise = prepareAssertion(
-    worker,
-    (response, data) => {
-      // --{ ASSERT }--
-      let result = true;
-      result = result && response;
-      result = result && data.wState.isActive;
-      return result;
-    }
-  );
-
   // --{ ACT }--
   worker.postMessage({
-    action: 'is-active?'
+    action: 'is-active?',
+    assert: true
   });
 
-  return resultPromise.then(
-    value => {
-      return {
-        message: '',
-        success: value
-      };
-    }
+  return prepareAssertion( worker ).then(
+    ({ response, data }) => executeAssertionBlock(() => {
+      // --{ ASSERT }--
+      let result = assert(
+        response, 'expect "response" to be true'
+      );
+      result = result && assert(
+        data.wState.isActive, 'expect "state.isActive" to be true'
+      );
+      return result;
+    })
   );
 }

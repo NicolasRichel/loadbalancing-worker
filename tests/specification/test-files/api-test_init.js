@@ -1,31 +1,52 @@
 import {
-  prepareAssertion,
+  assert,
   assertConfigEqual,
   assertStateEqual,
-  assertActionCalls
+  assertActionCalls,
+  prepareAssertion,
+  executeAssertionBlock
 } from '../test-utils.js';
 
 
-export const run = {
-  shouldInitializeConfig: shouldInitializeConfig,
-  shouldUpdateConfig: shouldUpdateConfig,
-  shouldStopLoadBalancingLoop: shouldStopLoadBalancingLoop
-};
+export const tests = [
+  {
+    description: 'should initialize worker configuration',
+    testFunction: shouldInitializeConfig
+  },
+  {
+    description: 'should update worker configuration',
+    testFunction: shouldUpdateConfig
+  },
+  {
+    description: 'should stop load balancing loop (if running)',
+    testFunction: shouldStopLoadBalancingLoop
+  }
+];
 
 
 function shouldInitializeConfig( worker ) {
-  // --{ ARRANGE }--
-  const resultPromise = prepareAssertion(
-    worker,
-    (response, data) => {
+  // --{ ACT }--
+  worker.postMessage({
+    action: 'init',
+    config: {
+      endpoints: ['A', 'B', 'C'],
+      loadBalancingScript: 'script.js',
+      interval: 2000
+    },
+    assert: true
+  });
+
+  return prepareAssertion( worker ).then(
+    ({ response, data }) => executeAssertionBlock(() => {
       // --{ ASSERT }--
-      let result = true;
-      result = result && response;
+      let result = assert(
+        response, 'expect "response" to be true'
+      );
       result = result && assertConfigEqual(
         data.wConfig,
         {
           endpoints: ['A', 'B', 'C'],
-          loadBalancingScript: '/specification/loadbalancing-test.js',
+          loadBalancingScript: 'script.js',
           interval: 2000
         }
       );
@@ -39,29 +60,10 @@ function shouldInitializeConfig( worker ) {
       );
       result = result && assertActionCalls(
         data.actionCalls,
-        ['initializeWorker', 'stopLoadBalancingLoop']
+        ['initializeWorker']
       );
       return result;
-    }
-  );
-
-  // --{ ACT }--
-  worker.postMessage({
-    action: 'init',
-    config: {
-      endpoints: ['A', 'B', 'C'],
-      loadBalancingScript: '/specification/loadbalancing-test.js',
-      interval: 2000
-    }
-  });
-
-  return resultPromise.then(
-    value => {
-      return {
-        message: '',
-        success: value
-      };
-    }
+    })
   );
 }
 
@@ -72,45 +74,36 @@ function shouldUpdateConfig( worker ) {
     action: 'init',
     config: {
       endpoints: ['A', 'B', 'C'],
-      loadBalancingScript: '/specification/loadbalancing-test.js'
+      loadBalancingScript: 'hello-world.js'
     }
   });
-
-  const resultPromise = prepareAssertion(
-    worker,
-    (response, data) => {
-      // --{ ASSERT }--
-      let result = true;
-      result = result && response;
-      result = result && assertConfigEqual(
-        data.wConfig,
-        {
-          endpoints: ['X', 'Y', 'Z'],
-          loadBalancingScript: '/specification/loadbalancing-test.js',
-          interval: 1500
-        }
-      );
-      return result;
-    }
-  );
 
   // --{ ACT }--
   worker.postMessage({
     action: 'init',
     config: {
       endpoints: ['X', 'Y', 'Z'],
-      loadBalancingScript: '/specification/loadbalancing-test.js',
       interval: 1500
-    }
+    },
+    assert: true
   });
 
-  return resultPromise.then(
-    value => {
-      return {
-        message: '',
-        success: value
-      };
-    }
+  return prepareAssertion( worker ).then(
+    ({ response, data }) => executeAssertionBlock(() => {
+      // --{ ASSERT }--
+      let result = assert(
+        response, 'expect "response" to be true'
+      );
+      result = result && assertConfigEqual(
+        data.wConfig,
+        {
+          endpoints: ['X', 'Y', 'Z'],
+          loadBalancingScript: 'hello-world.js',
+          interval: 1500
+        }
+      );
+      return result;
+    })
   );
 }
 
@@ -121,37 +114,34 @@ function shouldStopLoadBalancingLoop( worker ) {
     action: 'init',
     config: {
       endpoints: ['A', 'B', 'C'],
-      loadBalancingScript: '/specification/loadbalancing-test.js'
+      loadBalancingScript: 'toto.js'
     }
   });
-
   worker.postMessage({
     action: 'start'
   });
 
-  const resultPromise = prepareAssertion(
-    worker,
-    (response, data) => {
-      // --{ ASSERT }--
-      let result = true;
-      result = result && response;
-      result = result && !data.wState.isActive
-      return result;
-    }
-  );
-
   // --{ ACT }--
   worker.postMessage({
     action: 'init',
-    config: {}
+    config: {},
+    assert: true
   });
 
-  return resultPromise.then(
-    value => {
-      return {
-        message: '',
-        success: value
-      };
-    }
-  );
+  return prepareAssertion( worker ).then(
+      ({ response, data }) => executeAssertionBlock(() => {
+        // --{ ASSERT }--
+        let result = assert(
+          response, 'expect "response" to be true'
+        );
+        result = result && assert(
+          !data.wState.isActive, 'expect "state.isActive" to be false'
+        );
+        result = result && assertActionCalls(
+          data.actionCalls,
+          ['stopLoadBalancingLoop']
+        );
+        return result;
+      })
+    );
 }
