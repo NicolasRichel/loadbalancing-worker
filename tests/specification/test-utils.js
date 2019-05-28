@@ -71,7 +71,7 @@ export function prepareAssertion(worker) {
     (resolve, reject) => {
       let response;
       worker.onmessage = (e) => {
-        if (e.data.assert && e.data.type === 'proxy-data') {
+        if (e.data && e.data.type === 'proxy-data') {
           resolve({ response: response, data: e.data });
         } else {
           response = e.data;

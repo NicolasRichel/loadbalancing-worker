@@ -66,28 +66,28 @@ button:hover:not(:disabled) {
 /* Worker Name */
 /* ''''''''''' */
 
-label[for=worker-name] {
+label[for=worker-file] {
   margin-left: 5%;
   font-weight: bold;
 }
 
-#worker-name {
+#worker-file {
   min-width: 170px;
   height: 22px;
   padding-left: 5px;
 }
 
-#worker-name.error {
+#worker-file.error {
   height: 24px;
   margin: 0 2px;
   border: none;
   box-shadow: 0 0 8px var(--cinnabar);
 }
 
-#worker-name-message {
+#worker-file-message {
   position: absolute;
   top: 30px;
-  left: 0;
+  left: 4px;
   min-width: 170px;
   color: var(--thunderbird);
 }

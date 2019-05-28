@@ -20,10 +20,9 @@ export const tests = [
 function shouldBeFalseWhenIdle( worker ) {
   // --{ ARRANGE }--
   worker.postMessage({
-    action: 'init',
-    config: {
-      endpoints: ['A', 'B', 'C'],
-      loadBalancingScript: 'hello-world.js'
+    action: 'set-state',
+    state: {
+      isActive: false
     }
   });
 
@@ -51,14 +50,10 @@ function shouldBeFalseWhenIdle( worker ) {
 function shouldBeTrueWhenActive( worker ) {
   // --{ ARRANGE }--
   worker.postMessage({
-    action: 'init',
-    config: {
-      endpoints: ['A', 'B', 'C'],
-      loadBalancingScript: '/abcd.js'
+    action: 'set-state',
+    state: {
+      isActive: true
     }
-  });
-  worker.postMessage({
-    action: 'start'
   });
 
   // --{ ACT }--

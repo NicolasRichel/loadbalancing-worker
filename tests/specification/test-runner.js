@@ -2,8 +2,8 @@
 
 export class TestRunner {
 
-  constructor( workerName, testSuites ) {
-    this._workerName = workerName;
+  constructor( workerFile, testSuites ) {
+    this._workerFile = workerFile;
     this._testSuites = testSuites;
   }
 
@@ -82,7 +82,7 @@ export class TestRunner {
   _beforeEach( worker ) {
     worker.postMessage({
       action: 'proxy-init',
-      workerName: this._workerName
+      workerFile: this._workerFile
     });
   }
 

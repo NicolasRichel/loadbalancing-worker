@@ -4,61 +4,56 @@ import { TestRenderer } from './test-renderer.js';
 
 
 let testRunner = null;
+let testRenderer = null;
 
-const testRenderer = new TestRenderer( testSuites );
-
-const workerNameInput = document.getElementById('worker-name');
-const workerNameMessage = document.getElementById('worker-name-message');
+const workerFileInput = document.getElementById('worker-file');
+const workerFileMessage = document.getElementById('worker-file-message');
 const initButton = document.getElementById('init-btn');
-const runAllButton = document.getElementById('run-all-btn');
+let runAllButton = null;
 let runButtons = null;
 
 
 initButton.addEventListener(
   'click',
   () => {
-    workerNameInput.classList.remove('error');
-    workerNameMessage.textContent = '';
-    let workerName = workerNameInput.value;
-    workerName = workerName.endsWith('.js') ? workerName : workerName+'.js';
-    checkWorkerName(workerName).then(
-      workerNameOK => {
-        if ( workerNameOK ) {
-          testRunner = new TestRunner( workerName, testSuites );
-          testRenderer.initializeView();
-          initRunAllButton();
-          initRunButtons();
-        } else {
-          workerNameInput.classList.add('error');
-          workerNameMessage.textContent = 'unable to load worker file';
-        }
+    workerFileInput.classList.remove('error');
+    workerFileMessage.textContent = '';
+    let workerFile = workerFileInput.value;
+    workerFile = workerFile.endsWith('.js') ? workerFile : workerFile+'.js';
+    checkWorkerFile(workerFile).then(
+      () => {
+        testRunner = new TestRunner( workerFile, testSuites );
+        testRenderer = new TestRenderer( testSuites );
+        testRenderer.initializeView();
+        initRunAllButton();
+        initRunButtons();
+      }
+    ).catch(
+      error => {
+        workerFileInput.classList.add('error');
+        workerFileMessage.textContent = error;
       }
     );
   }
 );
-runAllButton.style.visibility = 'hidden';
-runAllButton.disabled = true;
-runAllButton.addEventListener(
-  'click',
-  () => testRunner && testRunner.runAllTestSuites().then(
-    testSuiteResults => testRenderer.renderAllTestSuites( testSuiteResults )
-  )
-);
 
 
-async function checkWorkerName( workerName ) {
-  try {
-    const response = await fetch(
-      `${window.location.origin}/workers/${workerName}`,
-      { method: 'HEAD', cache: 'no-cache' }
-    );
-    return response.status === 200;
-  } catch (error) {
-    return false;
-  }
+async function checkWorkerFile( workerFile ) {
+  // Check that worker file exists
+  const response = await fetch(
+    `${window.location.origin}/workers/${workerFile}`,
+    { method: 'HEAD', cache: 'no-cache' }
+  );
+  if (response.status !== 200)
+    throw 'unable to load worker file';
+  return;
 }
 
 function initRunAllButton() {
+  runAllButton = document.getElementById('run-all-btn');
+  runAllButton.onclick = () => testRunner && testRunner.runAllTestSuites().then(
+    testSuiteResults => testRenderer.renderAllTestSuites( testSuiteResults )
+  );
   runAllButton.style.visibility = 'visible';
   runAllButton.disabled = false;
 }
@@ -67,11 +62,8 @@ function initRunButtons() {
   runButtons = document.getElementsByClassName('run-btn');
   Array.prototype.forEach.call(
     runButtons,
-    btn => btn.addEventListener(
-      'click',
-      () => testRunner && testRunner.runTestSuite( btn.name ).then(
-        testSuiteResult => testRenderer.renderTestSuite( testSuiteResult )
-      )
+    btn => btn.onclick = () => testRunner && testRunner.runTestSuite( btn.name ).then(
+      testSuiteResult => testRenderer.renderTestSuite( testSuiteResult )
     )
   );
 }

@@ -23,7 +23,7 @@ const actions = {
     try {
       actions.stopLoadBalancingLoop();
       Object.assign(wConfig, config);
-      // self.importScripts( wConfig.loadBalancingScript );
+      self.importScripts( wConfig.loadBalancingScript );
       return true;
     } catch (err) {
       return false;
@@ -47,10 +47,13 @@ const actions = {
     return wState.isActive;
   },
   stopLoadBalancingLoop() {
-    clearInterval( wState.loadBalancingLoopID );
-    wState.loadBalancingLoopID = -1;
-    wState.isActive = false;
-    return true;
+    if (wState.isActive) {
+      clearInterval( wState.loadBalancingLoopID );
+      wState.loadBalancingLoopID = -1;
+      wState.isActive = false;
+      return true;
+    }
+    return false;
   },
   destroyWorker() {
     actions.stopLoadBalancingLoop();

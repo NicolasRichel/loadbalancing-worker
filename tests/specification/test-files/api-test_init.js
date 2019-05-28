@@ -2,7 +2,6 @@ import {
   assert,
   assertConfigEqual,
   assertStateEqual,
-  assertActionCalls,
   prepareAssertion,
   executeAssertionBlock
 } from '../test-utils.js';
@@ -18,8 +17,20 @@ export const tests = [
     testFunction: shouldUpdateConfig
   },
   {
-    description: 'should stop load balancing loop (if running)',
-    testFunction: shouldStopLoadBalancingLoop
+    description: 'should deactivate',
+    testFunction: shouldDeactivate
+  },
+  {
+    description: 'should return false if no endpoints are provided',
+    testFunction: shouldBeFalseIfNoEndpoints
+  },
+  {
+    description: 'should return false if load balancing script does not exist',
+    testFunction: shouldBeFalseWhenScriptNotExist
+  },
+  {
+    description: 'should return false if load balancing function does not exist',
+    testFunction: shouldBeFalseWhenFunctionNotExist
   }
 ];
 
@@ -30,7 +41,7 @@ function shouldInitializeConfig( worker ) {
     action: 'init',
     config: {
       endpoints: ['A', 'B', 'C'],
-      loadBalancingScript: 'script.js',
+      loadBalancingScript: '/specification/loadbalancing-test.js',
       interval: 2000
     },
     assert: true
@@ -46,7 +57,7 @@ function shouldInitializeConfig( worker ) {
         data.wConfig,
         {
           endpoints: ['A', 'B', 'C'],
-          loadBalancingScript: 'script.js',
+          loadBalancingScript: '/specification/loadbalancing-test.js',
           interval: 2000
         }
       );
@@ -58,10 +69,6 @@ function shouldInitializeConfig( worker ) {
           loadBalancingLoopID: -1
         }
       );
-      result = result && assertActionCalls(
-        data.actionCalls,
-        ['initializeWorker']
-      );
       return result;
     })
   );
@@ -71,7 +78,7 @@ function shouldInitializeConfig( worker ) {
 function shouldUpdateConfig( worker ) {
   // --{ ARRANGE }--
   worker.postMessage({
-    action: 'init',
+    action: 'set-config',
     config: {
       endpoints: ['A', 'B', 'C'],
       loadBalancingScript: 'hello-world.js'
@@ -83,6 +90,7 @@ function shouldUpdateConfig( worker ) {
     action: 'init',
     config: {
       endpoints: ['X', 'Y', 'Z'],
+      loadBalancingScript: '/specification/loadbalancing-test.js',
       interval: 1500
     },
     assert: true
@@ -98,7 +106,7 @@ function shouldUpdateConfig( worker ) {
         data.wConfig,
         {
           endpoints: ['X', 'Y', 'Z'],
-          loadBalancingScript: 'hello-world.js',
+          loadBalancingScript: '/specification/loadbalancing-test.js',
           interval: 1500
         }
       );
@@ -108,17 +116,20 @@ function shouldUpdateConfig( worker ) {
 }
 
 
-function shouldStopLoadBalancingLoop( worker ) {
+function shouldDeactivate( worker ) {
   // --{ ARRANGE }--
   worker.postMessage({
-    action: 'init',
+    action: 'set-config',
     config: {
       endpoints: ['A', 'B', 'C'],
-      loadBalancingScript: 'toto.js'
+      loadBalancingScript: '/specification/loadbalancing-test.js'
     }
   });
   worker.postMessage({
-    action: 'start'
+    action: 'set-state',
+    state: {
+      isActive: true
+    }
   });
 
   // --{ ACT }--
@@ -129,19 +140,51 @@ function shouldStopLoadBalancingLoop( worker ) {
   });
 
   return prepareAssertion( worker ).then(
-      ({ response, data }) => executeAssertionBlock(() => {
-        // --{ ASSERT }--
-        let result = assert(
-          response, 'expect "response" to be true'
-        );
-        result = result && assert(
-          !data.wState.isActive, 'expect "state.isActive" to be false'
-        );
-        result = result && assertActionCalls(
-          data.actionCalls,
-          ['stopLoadBalancingLoop']
-        );
-        return result;
-      })
-    );
+    ({ response, data }) => executeAssertionBlock(() => {
+      // --{ ASSERT }--
+      let result = assert(
+        response, 'expect "response" to be true'
+      );
+      result = result && assert(
+        !data.wState.isActive, 'expect "state.isActive" to be false'
+      );
+      return result;
+    })
+  );
+}
+
+
+function shouldBeFalseIfNoEndpoints() {
+  return Promise.resolve({
+    success: false,
+    message: 'test not implemented'
+  });
+}
+
+
+function shouldBeFalseWhenScriptNotExist( worker ) {
+  // --{ ACT }--
+  worker.postMessage({
+    action: 'init',
+    config: {
+      endpoints: [],
+      loadBalancingScript: 'unknown-script.js',
+    },
+    assert: true
+  });
+
+  return prepareAssertion( worker ).then(
+    ({ response, data }) => executeAssertionBlock(() => {
+      // --{ ASSERT }--
+      return assert( !response, 'expect "response" to be false' );
+    })
+  );
+}
+
+
+function shouldBeFalseWhenFunctionNotExist() {
+  return Promise.resolve({
+    success: false,
+    message: 'test not implemented'
+  });
 }

@@ -48,9 +48,12 @@ const actions = {
     return state.isActive;
   },
   stopLoadBalancingLoop() {
-    clearInterval( state.loadBalancingLoopID );
-    state.isActive = false;
-    return true;
+    if (wState.isActive) {
+      clearInterval( wState.loadBalancingLoopID );
+      wState.isActive = false;
+      return true;
+    }
+    return false;
   },
   destroyWorker() {
     actions.stopLoadBalancingLoop();

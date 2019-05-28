@@ -1,11 +1,13 @@
 import {
-  prepareAssertion, executeAssertionBlock, assert
+  assert,
+  prepareAssertion,
+  executeAssertionBlock
 } from '../test-utils.js';
 
 
 export const tests = [
   {
-    description: 'should activate if idle is idle',
+    description: 'should activate if worker is idle',
     testFunction: shouldActivateWhenIdle
   },
   {
@@ -18,10 +20,10 @@ export const tests = [
 function shouldActivateWhenIdle( worker ) {
   // --{ ARRANGE }--
   worker.postMessage({
-    action: 'init',
-    config: {
-      endpoints: ['A', 'B', 'C'],
-      loadBalancingScript: 'hello-world.js'
+    action: 'set-state',
+    state: {
+      isActive: false,
+      loadBalancingLoopID: -1
     }
   });
 
@@ -37,7 +39,7 @@ function shouldActivateWhenIdle( worker ) {
       let result = assert(
         response, 'expect "response" to be true'
       );
-      result = result &&  assert(
+      result = result && assert(
         data.wState.isActive, 'expect "state.isActive" to be true'
       );
       result = result && assert(
@@ -46,19 +48,16 @@ function shouldActivateWhenIdle( worker ) {
       return result;
     })
   );
-};
+}
 
 function shouldDoNothingWhenActive( worker ) {
   // --{ ARRANGE }--
   worker.postMessage({
-    action: 'init',
-    config: {
-      endpoints: ['A', 'B', 'C'],
-      loadBalancingScript: 'hello-world.js'
+    action: 'set-state',
+    state: {
+      isActive: true,
+      loadBalancingLoopID: 1
     }
-  });
-  worker.postMessage({
-    action: 'start'
   });
 
   // --{ ACT }--

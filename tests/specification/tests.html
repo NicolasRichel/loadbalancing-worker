@@ -12,15 +12,15 @@
   <body>
     <h1>Load Balancing Worker Tests</h1>
     <div>
-      <label for="worker-name">Worker file name : </label>
+      <label for="worker-file">Worker file name : </label>
       <span>
-        <input id="worker-name" type="text" value="worker" placeholder="Enter file name"/>
-        <span id="worker-name-message"></span>
+        <input id="worker-file" type="text" value="worker" placeholder="Enter file name"/>
+        <span id="worker-file-message"></span>
       </span>
       <button id="init-btn">Initialize</button>
     </div>
     <div>
-      <button id="run-all-btn">Run All Tests</button>
+      <button id="run-all-btn" style="visibility: hidden" disabled>Run All Tests</button>
     </div>
     <div id="test-report"></div>
     <div id="test-suites-results"></div>

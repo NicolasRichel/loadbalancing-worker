@@ -4,7 +4,7 @@ let actionCalls;
 
 self.onmessage = (e) => {
   if (e.data.action === 'proxy-init') {
-    self.importScripts(`/workers/${e.data.workerName}`);
+    self.importScripts(`/workers/${e.data.workerFile}`);
     setupActionWrapper();
     setupMessageHandler();
   }
@@ -40,12 +40,13 @@ function setupMessageHandler() {
       default:
         handleMessage(e);
     }
-    self.postMessage({
-      type: 'proxy-data',
-      wConfig: wConfig,
-      wState: wState,
-      actionCalls: actionCalls,
-      assert: !!e.data.assert
-    });
+    if (e.data.assert) {
+      self.postMessage({
+        type: 'proxy-data',
+        wConfig: wConfig,
+        wState: wState,
+        actionCalls: actionCalls
+      });
+    }
   }
 }
