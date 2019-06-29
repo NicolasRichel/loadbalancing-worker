@@ -7,6 +7,10 @@ if ! type "node" > /dev/null 2>&1; then
 fi
 
 # Check that Chromium is installed
+# Note :
+#   since the TestRunner use dynamic import and chromium is
+#   currently the only browser that support this technology,
+#   it is required to run tests.
 if ! type "chromium-browser" > /dev/null 2>&1; then
   echo "You need to have Chromium web browser installed to run this script."
   exit 0

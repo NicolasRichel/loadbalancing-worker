@@ -1,12 +1,12 @@
-/**
- * Load Balancing Worker
- * =====================
- */
+// =====================
+// Load Balancing Worker
+// =====================
+
 
 // Initial configuration of the worker
 let wConfig = {
   endpoints: [],
-  loadBalaningScript: '',
+  loadBalancingScript: '',
   interval: 5000
 };
 
@@ -14,7 +14,7 @@ let wConfig = {
 let wState = {
   isActive: false,
   targetEndpoint: '',
-  loadBalancingLoopID: null,
+  loadBalancingLoopID: -1,
 };
 
 // Worker Actions
@@ -23,33 +23,33 @@ const actions = {
     try {
       actions.stopLoadBalancingLoop();
       Object.assign(wConfig, config);
-      self.importScripts( state.loadBalancingScript );
+      self.importScripts( wConfig.loadBalancingScript );
       return true;
     } catch (err) {
       return false;
     }
   },
   startLoadBalancingLoop() {
-    if (!state.isActive) {
-      state.loadBalancingLoopID = setInterval(
-        () => loadBalancing( wConfig.endpoints ).then(server => state.targetEndpoint = server),
+    if (!wState.isActive) {
+      wState.loadBalancingLoopID = setInterval(
+        () => loadBalancing( wConfig.endpoints ).then(endpoint => wState.targetEndpoint = endpoint),
         wConfig.interval
       );
-      state.isActive = true;
+      wState.isActive = true;
       return true;
     }
     return false;
   },
   getEndpoint() {
-    if (state.isActive) return state.targetEndpoint;
-    return null;
+    return wState.isActive ? wState.targetEndpoint : null;
   },
   isActive() {
-    return state.isActive;
+    return wState.isActive;
   },
   stopLoadBalancingLoop() {
     if (wState.isActive) {
       clearInterval( wState.loadBalancingLoopID );
+      wState.loadBalancingLoopID = -1;
       wState.isActive = false;
       return true;
     }
